@@ -1,61 +1,75 @@
-# To-Do List Manager
+To-Do List Manager
 
 A simple, console-based To-Do List Manager written in Java. This application allows users to add, remove, view, and prioritize tasks. It also supports saving tasks to a file, loading tasks from a file, and searching tasks by keywords.
 
-## Features
+About
 
-- **Add Tasks**: Add tasks with a description and priority level (1-5).
-- **Remove Tasks**: Remove tasks by selecting the task number.
-- **View Tasks**: View all current tasks, displaying their status and priority.
-- **Mark Tasks as Completed**: Mark tasks as completed to track progress.
-- **Save Tasks to File**: Save tasks to a file for future use.
-- **Load Tasks from File**: Load tasks from a previously saved file.
-- **Search Tasks**: Search tasks by keywords in their description.
+The To-Do List Manager is designed to help users stay organized by keeping track of tasks and their priorities. Whether you're managing daily errands, project deadlines, or personal goals, this application provides a straightforward interface to manage your to-do list efficiently. With features like task completion tracking, search functionality, and file persistence, it offers both simplicity and utility in a lightweight package.
 
-## Getting Started
+Features
 
-### Prerequisites
+Add Tasks: Add tasks with a description and priority level (1-5).
 
-- Java Development Kit (JDK) 8 or later
-- A code editor or IDE (e.g., IntelliJ IDEA, Eclipse, or VS Code)
+Remove Tasks: Remove tasks by selecting the task number.
 
-### Installation
+View Tasks: View all current tasks, displaying their status and priority.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/ToDoListManager.git
-   ```
+Mark Tasks as Completed: Mark tasks as completed to track progress.
 
-2. Navigate to the project directory:
-   ```bash
-   cd ToDoListManager
-   ```
+Save Tasks to File: Save tasks to a file for future use.
 
-3. Compile the code:
-   ```bash
-   javac ToDoListApp.java
-   ```
+Load Tasks from File: Load tasks from a previously saved file.
 
-4. Run the application:
-   ```bash
-   java ToDoListApp
-   ```
+Search Tasks: Search tasks by keywords in their description.
 
-## Usage
+Getting Started
 
-1. Launch the application by running the `ToDoListApp` class.
-2. Use the menu to perform actions:
-   - Add a task with a description and priority.
-   - Remove tasks by selecting their number from the list.
-   - View all tasks with their status and priority.
-   - Mark tasks as completed.
-   - Save or load tasks to/from a file (`tasks.txt`).
-   - Search tasks by a keyword.
-3. Exit the application when done.
+Prerequisites
 
-## Example
+Java Development Kit (JDK) 8 or later
 
-```
+A code editor or IDE (e.g., IntelliJ IDEA, Eclipse, or VS Code)
+
+Installation
+
+Clone the repository:
+
+git clone https://github.com/your-username/ToDoListManager.git
+
+Navigate to the project directory:
+
+cd ToDoListManager
+
+Compile the code:
+
+javac ToDoListApp.java
+
+Run the application:
+
+java ToDoListApp
+
+Usage
+
+Launch the application by running the ToDoListApp class.
+
+Use the menu to perform actions:
+
+Add a task with a description and priority.
+
+Remove tasks by selecting their number from the list.
+
+View all tasks with their status and priority.
+
+Mark tasks as completed.
+
+Save or load tasks to/from a file (tasks.txt).
+
+Search tasks by a keyword.
+
+Exit the application when done.
+
+Example
+
 === To-Do List Manager ===
 1. Add Task
 2. Remove Task
@@ -69,31 +83,18 @@ Choose an option: 1
 Enter the task description: Finish the project
 Enter the task priority (1-5): 2
 Task added: Finish the project
-```
 
-## File Format
+File Format
 
-Tasks are saved in a `tasks.txt` file with the following format:
-```
+Tasks are saved in a tasks.txt file with the following format:
+
 <description>|<completed>|<priority>
-```
+
 Example:
-```
+
 Finish the project|false|2
 Prepare for the meeting|true|1
-```
 
-## Contributing
+Contributing
 
 Contributions are welcome! Please fork this repository and submit a pull request with your improvements.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For questions or suggestions, feel free to contact:
-- **Your Name**: your-email@example.com
-- GitHub: [your-username](https://github.com/your-username)
-
