@@ -1,6 +1,9 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
+import javax.swing.table.DefaultTableModel;
 
 class Task {
     private String description;
@@ -36,99 +39,142 @@ class Task {
     }
 }
 
-public class ToDoListApp {
+public class ToDoListApp extends JFrame {
     private ArrayList<Task> tasks;
-    private Scanner scanner;
-
+    private JTable taskTable;
+    private DefaultTableModel tableModel;
+    private JTextField descriptionField;
+    private JComboBox<Integer> priorityCombo;
+    
     public ToDoListApp() {
         tasks = new ArrayList<>();
-        scanner = new Scanner(System.in);
+        initializeUI();
     }
 
-    public void displayMenu() {
-        System.out.println("\n=== To-Do List Manager ===");
-        System.out.println("1. Add Task");
-        System.out.println("2. Remove Task");
-        System.out.println("3. View Tasks");
-        System.out.println("4. Mark Task as Completed");
-        System.out.println("5. Save Tasks to File");
-        System.out.println("6. Load Tasks from File");
-        System.out.println("7. Search Task");
-        System.out.println("8. Exit");
-        System.out.print("Choose an option: ");
-    }
-
-    public void addTask() {
-        System.out.print("Enter the task description: ");
-        String description = scanner.nextLine();
-        System.out.print("Enter the task priority (1-5): ");
-        int priority = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        tasks.add(new Task(description, priority));
-        System.out.println("Task added: " + description);
-    }
-
-    public void removeTask() {
-        System.out.println("Current Tasks:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + tasks.get(i));
-        }
-
-        System.out.print("Enter the task number to remove: ");
-        int taskNumber = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        if (taskNumber > 0 && taskNumber <= tasks.size()) {
-            Task removedTask = tasks.remove(taskNumber - 1);
-            System.out.println("Task removed: " + removedTask.getDescription());
-        } else {
-            System.out.println("Invalid task number.");
-        }
-    }
-
-    public void viewTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks available.");
-        } else {
-            System.out.println("Current Tasks:");
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + ". " + tasks.get(i));
+    private void initializeUI() {
+        setTitle("To-Do List Manager");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        // Create the table
+        String[] columns = {"Status", "Description", "Priority"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
             }
-        }
+        };
+        taskTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(taskTable);
+        
+        // Create input panel
+        JPanel inputPanel = new JPanel(new FlowLayout());
+        descriptionField = new JTextField(20);
+        priorityCombo = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
+        JButton addButton = new JButton("Add Task");
+        
+        inputPanel.add(new JLabel("Description:"));
+        inputPanel.add(descriptionField);
+        inputPanel.add(new JLabel("Priority:"));
+        inputPanel.add(priorityCombo);
+        inputPanel.add(addButton);
+        
+        // Create button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton removeButton = new JButton("Remove Task");
+        JButton completeButton = new JButton("Mark Completed");
+        JButton saveButton = new JButton("Save Tasks");
+        JButton loadButton = new JButton("Load Tasks");
+        JButton searchButton = new JButton("Search");
+        
+        buttonPanel.add(removeButton);
+        buttonPanel.add(completeButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(loadButton);
+        buttonPanel.add(searchButton);
+        
+        // Add components to frame
+        add(scrollPane, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.SOUTH);
+        
+        // Add button listeners
+        addButton.addActionListener(e -> addTask());
+        removeButton.addActionListener(e -> removeTask());
+        completeButton.addActionListener(e -> markTaskCompleted());
+        saveButton.addActionListener(e -> saveTasksToFile());
+        loadButton.addActionListener(e -> loadTasksFromFile());
+        searchButton.addActionListener(e -> searchTask());
+        
+        // Set frame properties
+        setSize(800, 500);
+        setLocationRelativeTo(null);
     }
 
-    public void markTaskCompleted() {
-        System.out.println("Current Tasks:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + tasks.get(i));
+    private void addTask() {
+        String description = descriptionField.getText().trim();
+        if (description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a task description");
+            return;
         }
+        
+        int priority = (Integer) priorityCombo.getSelectedItem();
+        Task task = new Task(description, priority);
+        tasks.add(task);
+        updateTaskTable();
+        descriptionField.setText("");
+    }
 
-        System.out.print("Enter the task number to mark as completed: ");
-        int taskNumber = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        if (taskNumber > 0 && taskNumber <= tasks.size()) {
-            tasks.get(taskNumber - 1).markCompleted();
-            System.out.println("Task marked as completed: " + tasks.get(taskNumber - 1).getDescription());
+    private void removeTask() {
+        int selectedRow = taskTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            tasks.remove(selectedRow);
+            updateTaskTable();
         } else {
-            System.out.println("Invalid task number.");
+            JOptionPane.showMessageDialog(this, "Please select a task to remove");
         }
     }
 
-    public void saveTasksToFile() {
+    private void markTaskCompleted() {
+        int selectedRow = taskTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            tasks.get(selectedRow).markCompleted();
+            updateTaskTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a task to mark as completed");
+        }
+    }
+
+    private void updateTaskTable() {
+        tableModel.setRowCount(0);
+        for (Task task : tasks) {
+            String status = task.isCompleted() ? "✓" : "○";
+            tableModel.addRow(new Object[]{
+                status,
+                task.getDescription(),
+                task.getPriority()
+            });
+        }
+    }
+
+    private void saveTasksToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("tasks.txt"))) {
             for (Task task : tasks) {
                 writer.write(task.getDescription() + "|" + task.isCompleted() + "|" + task.getPriority());
                 writer.newLine();
             }
-            System.out.println("Tasks saved to tasks.txt");
+            JOptionPane.showMessageDialog(this, "Tasks saved successfully");
         } catch (IOException e) {
-            System.out.println("An error occurred while saving tasks: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error saving tasks: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public void loadTasksFromFile() {
+    private void loadTasksFromFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader("tasks.txt"))) {
+            tasks.clear();
             String line;
-            while ((line = reader.readLine()) != null ) {
+            while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
                 String description = parts[0];
                 boolean completed = Boolean.parseBoolean(parts[1]);
@@ -139,69 +185,39 @@ public class ToDoListApp {
                 }
                 tasks.add(task);
             }
-            System.out.println("Tasks loaded from tasks.txt");
+            updateTaskTable();
+            JOptionPane.showMessageDialog(this, "Tasks loaded successfully");
         } catch (IOException e) {
-            System.out.println("An error occurred while loading tasks: " + e.getMessage());
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Error in task data format: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error loading tasks: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public void searchTask() {
-        System.out.print("Enter the keyword to search for: ");
-        String keyword = scanner.nextLine();
-        boolean found = false;
-        System.out.println("Search Results:");
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
-                System.out.println(task);
-                found = true;
+    private void searchTask() {
+        String keyword = JOptionPane.showInputDialog(this, "Enter search keyword:");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            ArrayList<Task> searchResults = new ArrayList<>();
+            for (Task task : tasks) {
+                if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                    searchResults.add(task);
+                }
             }
-        }
-        if (!found) {
-            System.out.println("No tasks found with the keyword: " + keyword);
-        }
-    }
-
-    public void run() {
-        while (true) {
-            displayMenu();
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            switch (choice) {
-                case 1:
-                    addTask();
-                    break;
-                case 2:
-                    removeTask();
-                    break;
-                case 3:
-                    viewTasks();
-                    break;
-                case 4:
-                    markTaskCompleted();
-                    break;
-                case 5:
-                    saveTasksToFile();
-                    break;
-                case 6:
-                    loadTasksFromFile();
-                    break;
-                case 7:
-                    searchTask();
-                    break;
-                case 8:
-                    System.out.println("Exiting the application.");
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            
+            if (searchResults.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No tasks found with the keyword: " + keyword);
+            } else {
+                StringBuilder result = new StringBuilder("Search Results:\n\n");
+                for (Task task : searchResults) {
+                    result.append(task.toString()).append("\n");
+                }
+                JOptionPane.showMessageDialog(this, result.toString());
             }
         }
     }
 
     public static void main(String[] args) {
-        ToDoListApp app = new ToDoListApp();
-        app.run();
+        SwingUtilities.invokeLater(() -> {
+            new ToDoListApp().setVisible(true);
+        });
     }
 }
